@@ -1,0 +1,738 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-clintrial-dev"
+		},
+		"AmazonS31_secretAccessKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'secretAccessKey' of 'AmazonS31'"
+		},
+		"ls_adls_clintrail_dev_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_adls_clintrail_dev'"
+		},
+		"ls_azuresql_clintrail_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_azuresql_clintrail'"
+		},
+		"AmazonS31_properties_typeProperties_accessKeyId": {
+			"type": "string",
+			"defaultValue": "AKIA24KE4WG5DIJZ5BGQ"
+		},
+		"ls_adls_clintrail_dev_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stclintraildev.dfs.core.windows.net/"
+		},
+		"ls_azuresql_clintrail_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "sql-clintrail-dev.database.windows.net"
+		},
+		"ls_azuresql_clintrail_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "sqldb-clintrial-dev"
+		},
+		"ls_azuresql_clintrail_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "CloudSA3046800b"
+		},
+		"ls_rest_api_data_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.wiseapp.live/institutes/672a0918ae3d6e9fadfbc622/classes"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_web_activity')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://api.wiseapp.live/institutes/672a0918ae3d6e9fadfbc622/classes"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "srcfiles_raw_load"
+				},
+				"annotations": [],
+				"lastPublishTime": "2026-07-02T12:31:43Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AmazonS31')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AmazonS3",
+				"typeProperties": {
+					"serviceUrl": "https://s3.amazonaws.com",
+					"accessKeyId": "[parameters('AmazonS31_properties_typeProperties_accessKeyId')]",
+					"secretAccessKey": {
+						"type": "SecureString",
+						"value": "[parameters('AmazonS31_secretAccessKey')]"
+					},
+					"authenticationType": "AccessKey"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_adls_clintrail_dev')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_adls_clintrail_dev_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('ls_adls_clintrail_dev_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_azuresql_clintrail')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ls_azuresql_clintrail_properties_typeProperties_server')]",
+					"database": "[parameters('ls_azuresql_clintrail_properties_typeProperties_database')]",
+					"encrypt": "optional",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ls_azuresql_clintrail_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_azuresql_clintrail_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_rest_api_data')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('ls_rest_api_data_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/shir-local-computer')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_bin_sourcefiles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pDsSourceContainerName": {
+						"type": "string"
+					},
+					"pDsSourceFolderPath": {
+						"type": "string"
+					},
+					"pDsSourceFilename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().pDsSourceFilename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().pDsSourceFolderPath",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().pDsSourceContainerName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_bin_targetfiles')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pDsTargetContainerName": {
+						"type": "string"
+					},
+					"pDsTargetFolderPath": {
+						"type": "string"
+					},
+					"pDsTargetFilename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().pDsTargetFilename",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().pDsTargetFolderPath",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().pDsTargetContainerName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_cust_source_folder')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "sourcefiles/customer",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_raw_dm')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "raw/DM",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_sales_csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "sourcefiles/dm",
+						"fileSystem": "cr-clintrail"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_sales_raw')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "raw/dm",
+						"fileSystem": "cr-clintrail"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_source_files_validation')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ind_sales_20260625.csv",
+						"folderPath": "sourcefiles/sales",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_sourcefile_sales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "can_sales_202260623.csv",
+						"folderPath": "sourcefiles/sales",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "sale_id",
+						"type": "String"
+					},
+					{
+						"name": "product",
+						"type": "String"
+					},
+					{
+						"name": "category",
+						"type": "String"
+					},
+					{
+						"name": "quantity",
+						"type": "String"
+					},
+					{
+						"name": "price",
+						"type": "String"
+					},
+					{
+						"name": "sale_date",
+						"type": "String"
+					},
+					{
+						"name": "region",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_sourcefiles_sales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "ind_sales_20260620.csv",
+						"folderPath": "sourcefiles/sales",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "sale_id",
+						"type": "String"
+					},
+					{
+						"name": "product",
+						"type": "String"
+					},
+					{
+						"name": "category",
+						"type": "String"
+					},
+					{
+						"name": "quantity",
+						"type": "String"
+					},
+					{
+						"name": "price",
+						"type": "String"
+					},
+					{
+						"name": "sale_date",
+						"type": "String"
+					},
+					{
+						"name": "region",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_sourcefiles_sales_files')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pFiles": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().pFiles",
+							"type": "Expression"
+						},
+						"folderPath": "sourcefiles/sales",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "claim_id",
+						"type": "String"
+					},
+					{
+						"name": "encounter_id",
+						"type": "String"
+					},
+					{
+						"name": "payer_id",
+						"type": "String"
+					},
+					{
+						"name": "admit_date",
+						"type": "String"
+					},
+					{
+						"name": "discharge_date",
+						"type": "String"
+					},
+					{
+						"name": "total_billed_amount",
+						"type": "String"
+					},
+					{
+						"name": "total_allowed_amount",
+						"type": "String"
+					},
+					{
+						"name": "total_paid_amount",
+						"type": "String"
+					},
+					{
+						"name": "claim_status",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_sqlserver_source_target_mapping_json')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "sql_server_source_target_mapping_lookup.json",
+						"folderPath": "lookupfiles",
+						"fileSystem": "cr-clintrail"
+					}
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"SourceServerName": {
+							"type": "string"
+						},
+						"SourceDatabasename": {
+							"type": "string"
+						},
+						"SourceSchemaName": {
+							"type": "string"
+						},
+						"SourceTableName": {
+							"type": "string"
+						},
+						"TargetServerName": {
+							"type": "string"
+						},
+						"TargetDatabasename": {
+							"type": "string"
+						},
+						"TargetSchemaName": {
+							"type": "string"
+						},
+						"TargetTableName": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_srcfiles_dm')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "dm_20260610.csv",
+						"folderPath": "sourceFiles/DM",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "sale_id",
+						"type": "String"
+					},
+					{
+						"name": "product",
+						"type": "String"
+					},
+					{
+						"name": "category",
+						"type": "String"
+					},
+					{
+						"name": "quantity",
+						"type": "String"
+					},
+					{
+						"name": "price",
+						"type": "String"
+					},
+					{
+						"name": "sale_date",
+						"type": "String"
+					},
+					{
+						"name": "region",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_adls_target_files')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_clintrail_dev",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pFilename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().pFilename",
+							"type": "Expression"
+						},
+						"folderPath": "targetfiles",
+						"fileSystem": "cr-clintrail"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_clintrail_dev')]"
+			]
+		}
+	]
+}

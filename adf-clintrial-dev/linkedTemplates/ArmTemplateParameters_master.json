@@ -1,0 +1,99 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-clintrial-dev"
+		},
+		"AmazonS31_secretAccessKey": {
+			"value": ""
+		},
+		"ls_adls_clintrail_dev_accountKey": {
+			"value": ""
+		},
+		"ls_azuresql_clintrail_password": {
+			"value": ""
+		},
+		"ls_oracle_healconnectraw_password": {
+			"value": ""
+		},
+		"ls_sqlserver_azuretest_dbo_patient_password": {
+			"value": ""
+		},
+		"ls_sqlserver_healthconnect_raw_password": {
+			"value": ""
+		},
+		"ls_sqlserver_multiple_db_password": {
+			"value": ""
+		},
+		"ls_sqlserver_param_password": {
+			"value": ""
+		},
+		"AmazonS31_properties_typeProperties_accessKeyId": {
+			"value": "AKIA24KE4WG5DIJZ5BGQ"
+		},
+		"ls_adls_clintrail_dev_properties_typeProperties_url": {
+			"value": "https://stclintraildev.dfs.core.windows.net/"
+		},
+		"ls_azuresql_clintrail_properties_typeProperties_server": {
+			"value": "sql-clintrail-dev.database.windows.net"
+		},
+		"ls_azuresql_clintrail_properties_typeProperties_database": {
+			"value": "sqldb-clintrial-dev"
+		},
+		"ls_azuresql_clintrail_properties_typeProperties_userName": {
+			"value": "CloudSA3046800b"
+		},
+		"ls_oracle_healconnectraw_properties_typeProperties_server": {
+			"value": "localhost:1521/orcl"
+		},
+		"ls_oracle_healconnectraw_properties_typeProperties_username": {
+			"value": "C##health_connect_raw"
+		},
+		"ls_rest_api_data_properties_typeProperties_url": {
+			"value": "https://api.wiseapp.live/institutes/672a0918ae3d6e9fadfbc622/classes"
+		},
+		"ls_sqlserver_azuretest_dbo_patient_properties_typeProperties_server": {
+			"value": "localhost\\SQLEXPRESS"
+		},
+		"ls_sqlserver_azuretest_dbo_patient_properties_typeProperties_database": {
+			"value": "azure_test"
+		},
+		"ls_sqlserver_azuretest_dbo_patient_properties_typeProperties_userName": {
+			"value": "Dell\\vaibh"
+		},
+		"ls_sqlserver_healthconnect_raw_properties_typeProperties_server": {
+			"value": "localhost\\SQLEXPRESS"
+		},
+		"ls_sqlserver_healthconnect_raw_properties_typeProperties_database": {
+			"value": "dev_healthConnect_raw"
+		},
+		"ls_sqlserver_healthconnect_raw_properties_typeProperties_userName": {
+			"value": "adf_login"
+		},
+		"ls_sqlserver_multiple_db_properties_typeProperties_server": {
+			"value": "@{linkedService().pLsServerName}"
+		},
+		"ls_sqlserver_multiple_db_properties_typeProperties_database": {
+			"value": "@{linkedService().pLSDatabseName}"
+		},
+		"ls_sqlserver_multiple_db_properties_typeProperties_userName": {
+			"value": "adf_login"
+		},
+		"ls_sqlserver_param_properties_typeProperties_server": {
+			"value": "@{linkedService().pLsServerName}"
+		},
+		"ls_sqlserver_param_properties_typeProperties_database": {
+			"value": "@{linkedService().pLsDatabasename}"
+		},
+		"ls_sqlserver_param_properties_typeProperties_userName": {
+			"value": "adf_login"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
