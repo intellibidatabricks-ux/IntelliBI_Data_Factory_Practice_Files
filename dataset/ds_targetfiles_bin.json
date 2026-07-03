@@ -1,0 +1,28 @@
+{
+	"name": "ds_targetfiles_bin",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_clintrail_dev",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tgtFiles": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().tgtFiles",
+					"type": "Expression"
+				},
+				"folderPath": "TargetFiles",
+				"fileSystem": "cr-clintrail"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

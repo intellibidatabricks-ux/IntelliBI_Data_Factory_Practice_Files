@@ -1,0 +1,37 @@
+{
+	"name": "pl_dataflow_Exists",
+	"properties": {
+		"activities": [
+			{
+				"name": "DataflowUnion",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "dataflowexists",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "data_flow_activity"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-06-30T03:35:52Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

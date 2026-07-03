@@ -1,0 +1,39 @@
+{
+	"name": "ds_targetfiles_param",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_clintrail_dev",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pDsTargetFolder": {
+				"type": "string"
+			},
+			"pDsSourceFile": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().pDsSourceFile",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().pDsTargetFolder",
+					"type": "Expression"
+				},
+				"fileSystem": "cr-clintrail"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

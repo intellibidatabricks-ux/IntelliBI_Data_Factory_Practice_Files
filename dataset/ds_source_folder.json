@@ -1,0 +1,27 @@
+{
+	"name": "ds_source_folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_clintrail_dev",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pFolder": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().pFolder",
+					"type": "Expression"
+				},
+				"fileSystem": "cr-clintrail"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

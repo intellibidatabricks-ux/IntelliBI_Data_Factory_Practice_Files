@@ -1,0 +1,33 @@
+{
+	"name": "ds_targetfiles_sales_other_countries",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_clintrail_dev",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pTargetFiles": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().pTargetFiles",
+					"type": "Expression"
+				},
+				"folderPath": "targetfiles/sales/other_countries",
+				"fileSystem": "cr-clintrail"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

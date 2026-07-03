@@ -1,0 +1,90 @@
+{
+	"name": "dataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceEmp"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceDept"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EmpId as integer,",
+				"          EmpName as string,",
+				"          Salary as decimal(10,2),",
+				"          Gender as string,",
+				"          DepartmentID as integer,",
+				"          DepartmentLocation as string,",
+				"          HireDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'EmployeeInfo',",
+				"     isolationLevel: 'READ_COMMITTED',",
+				"     partitionBy('hash', 1)) ~> sourceEmp",
+				"source(output(",
+				"          DeptId as integer,",
+				"          DeptName as string,",
+				"          DeptRank as integer,",
+				"          DepartmentLocation as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'DepartmentInfo',",
+				"     isolationLevel: 'READ_COMMITTED') ~> sourceDept",
+				"sourceEmp, sourceDept join(DepartmentID == DeptId,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     partitionBy('roundRobin', 347),",
+				"     broadcast: 'auto')~> join",
+				"join sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'Emp_Dept_Info',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     recreate: true,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

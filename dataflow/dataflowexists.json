@@ -1,0 +1,99 @@
+{
+	"name": "dataflowexists",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceJanSales"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceFebSales"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "castFebSales"
+				},
+				{
+					"name": "existsJanFeb"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          sale_id as integer,",
+				"          product as string,",
+				"          category as string,",
+				"          quantity as integer,",
+				"          price as double,",
+				"          sale_date as date,",
+				"          region as string,",
+				"          EMAIL as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'RAW',",
+				"     tableName: 'Jan_Sales_2026',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> sourceJanSales",
+				"source(output(",
+				"          sale_id as string,",
+				"          product as string,",
+				"          category as string,",
+				"          quantity as string,",
+				"          price as string,",
+				"          sale_date as string,",
+				"          region as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'RAW',",
+				"     tableName: 'Feb_Sales_2026',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> sourceFebSales",
+				"sourceFebSales cast(output(",
+				"          sale_id as short,",
+				"          quantity as short,",
+				"          price as double,",
+				"          sale_date as date 'yyyy-MM-dd'",
+				"     ),",
+				"     errors: true) ~> castFebSales",
+				"sourceJanSales, castFebSales exists(sourceJanSales@sale_id == castFebSales@sale_id,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> existsJanFeb",
+				"existsJanFeb sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'TblUnoinJanFeb',",
+				"     insertable: true,",
+				"     updateable: false,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}
