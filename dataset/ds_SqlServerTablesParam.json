@@ -19,7 +19,13 @@
 			"pDsServerName": {
 				"type": "string"
 			},
-			"pDsDatabasename": {
+			"pDsDatabaseName": {
+				"type": "string"
+			},
+			"pDsSchemaName": {
+				"type": "string"
+			},
+			"pDsTableName": {
 				"type": "string"
 			}
 		},
@@ -84,8 +90,14 @@
 			}
 		],
 		"typeProperties": {
-			"schema": "edcsrcmetadata",
-			"table": "srcEdcClintrailToLandControl"
+			"schema": {
+				"value": "@dataset().pDsSchemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().pDsTableName",
+				"type": "Expression"
+			}
 		}
 	}
 }
