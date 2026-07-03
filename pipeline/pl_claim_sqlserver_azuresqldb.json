@@ -52,7 +52,7 @@
 			}
 		],
 		"folder": {
-			"name": "sqlserver_azuresqldb_load"
+			"name": "Azure Data Factory Daily Practice PipeLines/sqlserver_azuresqldb_load"
 		},
 		"annotations": [],
 		"lastPublishTime": "2026-06-15T02:28:15Z"

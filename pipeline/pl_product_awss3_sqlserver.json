@@ -57,7 +57,7 @@
 			}
 		],
 		"folder": {
-			"name": "awss3_sqlserverdb_data_load"
+			"name": "Azure Data Factory Daily Practice PipeLines/awss3_sqlserverdb_data_load"
 		},
 		"annotations": [],
 		"lastPublishTime": "2026-06-16T03:07:47Z"

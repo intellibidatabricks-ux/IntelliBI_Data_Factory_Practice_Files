@@ -65,6 +65,9 @@
 				]
 			}
 		],
+		"folder": {
+			"name": "Azure Data Factory Daily Practice PipeLines/azuresq_adls_raw_load"
+		},
 		"annotations": [],
 		"lastPublishTime": "2026-06-29T02:15:40Z"
 	},

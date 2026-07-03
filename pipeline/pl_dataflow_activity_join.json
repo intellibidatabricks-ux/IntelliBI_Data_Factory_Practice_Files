@@ -28,7 +28,7 @@
 			}
 		],
 		"folder": {
-			"name": "data_flow_activity"
+			"name": "Azure Data Factory Daily Practice PipeLines/data_flow_activity"
 		},
 		"annotations": [],
 		"lastPublishTime": "2026-06-30T08:47:16Z"

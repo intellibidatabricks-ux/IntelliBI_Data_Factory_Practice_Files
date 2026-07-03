@@ -207,7 +207,7 @@
 			}
 		],
 		"folder": {
-			"name": "IncrementalDataload"
+			"name": "Azure Data Factory Daily Practice PipeLines/IncrementalDataload"
 		},
 		"annotations": [],
 		"lastPublishTime": "2026-06-17T23:41:10Z"

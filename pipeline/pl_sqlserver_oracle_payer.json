@@ -49,7 +49,7 @@
 			}
 		],
 		"folder": {
-			"name": "sqlserver_oracle_data_laod"
+			"name": "Azure Data Factory Daily Practice PipeLines/sqlserver_oracle_data_laod"
 		},
 		"annotations": [],
 		"lastPublishTime": "2026-06-16T02:46:36Z"
