@@ -1,0 +1,138 @@
+{
+	"name": "pl_sqlserver_db_parameterised",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "SqlServerSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"tableOption": "autoCreate"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sqlserver_mul_db_tables",
+						"type": "DatasetReference",
+						"parameters": {
+							"pDsSourceDatabase": {
+								"value": "@pipeline().parameters.pSourceDatabaseName",
+								"type": "Expression"
+							},
+							"pDsSourceSchemaName": {
+								"value": "@pipeline().parameters.pSourceSchemaName",
+								"type": "Expression"
+							},
+							"pDsSourceTableName": {
+								"value": "@pipeline().parameters.pSourceTableName",
+								"type": "Expression"
+							},
+							"pDsTargetDatabase": {
+								"value": "@pipeline().parameters.pTargetDatabaseName",
+								"type": "Expression"
+							},
+							"pDsTargetSchemaName": {
+								"value": "@pipeline().parameters.pTargetSchemaName",
+								"type": "Expression"
+							},
+							"pDsTargetTableName": {
+								"value": "@pipeline().parameters.pTargetTableName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_sqlserver_mul_db_tables",
+						"type": "DatasetReference",
+						"parameters": {
+							"pDsSourceDatabase": {
+								"value": "@pipeline().parameters.pSourceDatabaseName",
+								"type": "Expression"
+							},
+							"pDsSourceSchemaName": {
+								"value": "@pipeline().parameters.pSourceSchemaName",
+								"type": "Expression"
+							},
+							"pDsSourceTableName": {
+								"value": "@pipeline().parameters.pSourceTableName",
+								"type": "Expression"
+							},
+							"pDsTargetDatabase": {
+								"value": "@pipeline().parameters.pTargetDatabaseName",
+								"type": "Expression"
+							},
+							"pDsTargetSchemaName": {
+								"value": "@pipeline().parameters.pTargetSchemaName",
+								"type": "Expression"
+							},
+							"pDsTargetTableName": {
+								"value": "@pipeline().parameters.pTargetTableName",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"pSourceDatabaseName": {
+				"type": "string",
+				"defaultValue": "dev_healthConnect_raw"
+			},
+			"pSourceSchemaName": {
+				"type": "string",
+				"defaultValue": "adf_test"
+			},
+			"pSourceTableName": {
+				"type": "string",
+				"defaultValue": "prod"
+			},
+			"pTargetDatabaseName": {
+				"type": "string",
+				"defaultValue": "dev_HealthConnect_cleansed"
+			},
+			"pTargetSchemaName": {
+				"type": "string",
+				"defaultValue": "adf_cleansed"
+			},
+			"pTargetTableName": {
+				"type": "string",
+				"defaultValue": "tgt_prod"
+			}
+		},
+		"folder": {
+			"name": "for_each_activity"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-06-25T03:32:57Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

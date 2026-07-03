@@ -1,0 +1,136 @@
+{
+	"name": "dataflowCustScdType1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceCustData"
+				},
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sourceLkpCustData"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "ls_azuresql_clintrail",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkCustData"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookupSrouceTargetCust"
+				},
+				{
+					"name": "selectColumnRename"
+				},
+				{
+					"name": "derivedColumnRowType"
+				},
+				{
+					"name": "filterInsertUpdateRecOnly"
+				},
+				{
+					"name": "alterRowInsertUpdate"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CustID as integer,",
+				"          CustName as string,",
+				"          ProdPurchase as decimal(10,2),",
+				"          City as string,",
+				"          PhoneNumber as string,",
+				"          PurchaseDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'SrcCustData',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> sourceCustData",
+				"source(output(",
+				"          CustID as integer,",
+				"          CustName as string,",
+				"          ProdPurchase as decimal(10,2),",
+				"          City as string,",
+				"          PhoneNumber as string,",
+				"          PurchaseDate as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'TgtCustData',",
+				"     isolationLevel: 'READ_UNCOMMITTED') ~> sourceLkpCustData",
+				"sourceCustData, sourceLkpCustData lookup(sourceCustData@CustID == sourceLkpCustData@CustID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupSrouceTargetCust",
+				"lookupSrouceTargetCust select(mapColumn(",
+				"          SrcCustID = sourceCustData@CustID,",
+				"          SrcCustName = sourceCustData@CustName,",
+				"          SrcProdPurchase = sourceCustData@ProdPurchase,",
+				"          SrcCity = sourceCustData@City,",
+				"          SrcPhoneNumber = sourceCustData@PhoneNumber,",
+				"          SrcPurchaseDate = sourceCustData@PurchaseDate,",
+				"          LkpCustID = sourceLkpCustData@CustID,",
+				"          LkpCustName = sourceLkpCustData@CustName,",
+				"          LkpProdPurchase = sourceLkpCustData@ProdPurchase,",
+				"          LkpCity = sourceLkpCustData@City,",
+				"          LkpPhoneNumber = sourceLkpCustData@PhoneNumber,",
+				"          LkpPurchaseDate = sourceLkpCustData@PurchaseDate",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColumnRename",
+				"selectColumnRename derive(rowType = iif( isNull(LkpCustID),'Insert',\r",
+				"     iif( !isNull(LkpCustID) &&      (SrcCity != LkpCity || SrcPhoneNumber != LkpPhoneNumber) \r",
+				"          , 'Update','Reject'))) ~> derivedColumnRowType",
+				"derivedColumnRowType filter(rowType == 'Insert' || rowType == 'Update') ~> filterInsertUpdateRecOnly",
+				"filterInsertUpdateRecOnly alterRow(insertIf(rowType=='Insert'),",
+				"     updateIf(rowType=='Update')) ~> alterRowInsertUpdate",
+				"alterRowInsertUpdate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          CustID as integer,",
+				"          CustName as string,",
+				"          ProdPurchase as decimal(10,2),",
+				"          City as string,",
+				"          PhoneNumber as string,",
+				"          PurchaseDate as date",
+				"     ),",
+				"     format: 'table',",
+				"     store: 'sqlserver',",
+				"     schemaName: 'dbo',",
+				"     tableName: 'TgtCustData',",
+				"     insertable: true,",
+				"     updateable: true,",
+				"     deletable: false,",
+				"     upsertable: false,",
+				"     keys:['CustID'],",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          CustID = SrcCustID,",
+				"          CustName = SrcCustName,",
+				"          ProdPurchase = SrcProdPurchase,",
+				"          City = SrcCity,",
+				"          PhoneNumber = SrcPhoneNumber,",
+				"          PurchaseDate = SrcPurchaseDate",
+				"     )) ~> sinkCustData"
+			]
+		}
+	}
+}

@@ -1,0 +1,375 @@
+{
+	"name": "pl_sqlserver_source_sink_param_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_Source_Target_Mapping",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_adls_sqlserver_source_target_mapping_json",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup_Source_Target_Mapping",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_Source_Target_Mapping').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copydata_source_target_param",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "SqlServerSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate"
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sqlserver_source_table_param",
+									"type": "DatasetReference",
+									"parameters": {
+										"pDsSourceServerName": {
+											"value": "@item().SourceServerName",
+											"type": "Expression"
+										},
+										"pDsSourceDatabasename": {
+											"value": "@item().SourceDatabasename",
+											"type": "Expression"
+										},
+										"pDsSourceSchemaName": {
+											"value": "@item().SourceSchemaName",
+											"type": "Expression"
+										},
+										"pDsSourceTableName": {
+											"value": "@item().SourceTableName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_sqlserver_target_table_param",
+									"type": "DatasetReference",
+									"parameters": {
+										"pDsTargetServerName": {
+											"value": "@item().TargetServerName",
+											"type": "Expression"
+										},
+										"pDsTargetDatabasename": {
+											"value": "@item().TargetDatabasename",
+											"type": "Expression"
+										},
+										"pDsTargetSchemaName": {
+											"value": "@item().TargetSchemaName",
+											"type": "Expression"
+										},
+										"pDsTargetTableName": {
+											"value": "@item().TargetTableName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Stored procedure audit log table_successs",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copydata_source_target_param",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[proc_df_audit_log_table_load]",
+								"storedProcedureParameters": {
+									"dfname": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"err_msg": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.errors",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"exec_time": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"load_end_ts": {
+										"value": {
+											"value": "@utcNow()",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"load_st_tm": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.executionDetails[0].start",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pl_id": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pl_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"src_rows_read": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"src_tbl_name": {
+										"value": {
+											"value": "@concat(item().SourceDatabasename,item().SourceSchemaName,item().SourceTableName)\n",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"status": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.executionDetails[0].status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"tgt_row_write": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"tgt_tbl_name": {
+										"value": {
+											"value": "@concat(item().TargetDatabasename,item().TargetSchemaName,item().TargetTableName)",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_sqlserver_healthconnect_raw",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Stored procedure audit log table_fail",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Copydata_source_target_param",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[proc_df_audit_log_table_load]",
+								"storedProcedureParameters": {
+									"dfname": {
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"err_msg": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.errors",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"exec_time": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"load_end_ts": {
+										"value": {
+											"value": "@utcNow()",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"load_st_tm": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.executionDetails[0].start",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"pl_id": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"pl_name": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"src_rows_read": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"src_tbl_name": {
+										"value": {
+											"value": "@concat(item().SourceDatabasename,item().SourceSchemaName,item().SourceTableName)\n",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"status": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.executionDetails[0].status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"tgt_row_write": {
+										"value": {
+											"value": "@activity('Copydata_source_target_param').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"tgt_tbl_name": {
+										"value": {
+											"value": "@concat(item().TargetDatabasename,item().TargetSchemaName,item().TargetTableName)",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_sqlserver_healthconnect_raw",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "for_each_activity"
+		},
+		"annotations": [],
+		"lastPublishTime": "2026-06-27T03:50:08Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

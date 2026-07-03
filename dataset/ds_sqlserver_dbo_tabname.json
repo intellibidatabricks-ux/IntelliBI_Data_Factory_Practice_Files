@@ -1,0 +1,62 @@
+{
+	"name": "ds_sqlserver_dbo_tabname",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqlserver_healthconnect_raw",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "product_id",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sku",
+				"type": "nvarchar"
+			},
+			{
+				"name": "product_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "category",
+				"type": "nvarchar"
+			},
+			{
+				"name": "sub_category",
+				"type": "nvarchar"
+			},
+			{
+				"name": "brand",
+				"type": "nvarchar"
+			},
+			{
+				"name": "supplier",
+				"type": "nvarchar"
+			},
+			{
+				"name": "unit_cost",
+				"type": "nvarchar"
+			},
+			{
+				"name": "list_price",
+				"type": "nvarchar"
+			},
+			{
+				"name": "launch_date",
+				"type": "nvarchar"
+			},
+			{
+				"name": "status",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "product"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

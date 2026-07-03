@@ -1,0 +1,17 @@
+{
+	"name": "ds_healthconnraw_payer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_oracle_healconnectraw",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "C##HEALTH_CONNECT_REFINED",
+			"table": "PAYERS_RE"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
