@@ -146,6 +146,100 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "LookupGetMaxMetaData",
+							"type": "Lookup",
+							"dependsOn": [
+								{
+									"activity": "Copydata_copy1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "SqlServerSource",
+									"sqlReaderQuery": {
+										"value": "@concat('SELECT MAX([', coalesce(item().WatermarkColName,'MODIFIED_TS'),\n        ']) AS NewWatermark FROM ', item().SrcSchemaName, '.', item().SrcTableName)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_SqlServerTablesParam",
+									"type": "DatasetReference",
+									"parameters": {
+										"pDsServerName": "localhost\\SQLEXPRESS",
+										"pDsDatabaseName": "dev_clintrail_edc_src",
+										"pDsSchemaName": "src",
+										"pDsTableName": "DM"
+									}
+								}
+							}
+						},
+						{
+							"name": "Stored procedureUpdtMxModifiedDt",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "LookupGetMaxMetaData",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[edcsrcmetadata].[usp_UpdateMxWatermark]",
+								"storedProcedureParameters": {
+									"MetadataId": {
+										"value": {
+											"value": "@item().MetadataId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"NewWatermarkValue": {
+										"value": {
+											"value": "@item().activity('Lookup1').output",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_sqlserver_param",
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"pLsServerName": {
+										"value": "@item().SrcServerName",
+										"type": "Expression"
+									},
+									"pLsDatabasename": {
+										"value": "@item().SrcDatabaseName",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
