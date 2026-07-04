@@ -219,7 +219,7 @@
 									},
 									"NewWatermarkValue": {
 										"value": {
-											"value": "@item().activity('Lookup1').output",
+											"value": "@activity('LookupGetMaxMetaData').output.firstRow.NewWatermark",
 											"type": "Expression"
 										},
 										"type": "DateTime"
