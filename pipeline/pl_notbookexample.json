@@ -180,10 +180,22 @@
 									"referenceName": "ds_SqlServerTablesParam",
 									"type": "DatasetReference",
 									"parameters": {
-										"pDsServerName": "localhost\\SQLEXPRESS",
-										"pDsDatabaseName": "dev_clintrail_edc_src",
-										"pDsSchemaName": "src",
-										"pDsTableName": "DM"
+										"pDsServerName": {
+											"value": "@item().SrcServerName",
+											"type": "Expression"
+										},
+										"pDsDatabaseName": {
+											"value": "@item().SrcDatabaseName",
+											"type": "Expression"
+										},
+										"pDsSchemaName": {
+											"value": "@item().SrcSchemaName",
+											"type": "Expression"
+										},
+										"pDsTableName": {
+											"value": "@item().SrcTableName",
+											"type": "Expression"
+										}
 									}
 								}
 							}
