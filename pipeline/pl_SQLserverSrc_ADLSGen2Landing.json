@@ -1,5 +1,5 @@
 {
-	"name": "pl_notbookexample",
+	"name": "pl_SQLserverSrc_ADLSGen2Landing",
 	"properties": {
 		"activities": [
 			{
@@ -258,7 +258,7 @@
 			}
 		],
 		"folder": {
-			"name": "Azure Data Factory Daily Practice PipeLines/sqlserver_oracle_data_laod"
+			"name": "dev_clintrail/SQLServerSrc_ADLSGen2Landing"
 		},
 		"annotations": []
 	}
