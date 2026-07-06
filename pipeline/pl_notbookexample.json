@@ -140,7 +140,7 @@
 											"type": "Expression"
 										},
 										"pDsFileName": {
-											"value": "@concat(item().SrcTableName,'.parquet')",
+											"value": "@concat(item().SrcTableName, '_', formatDateTime(utcNow(),'yyyyMMddHHmmss'), '.parquet')",
 											"type": "Expression"
 										}
 									}
