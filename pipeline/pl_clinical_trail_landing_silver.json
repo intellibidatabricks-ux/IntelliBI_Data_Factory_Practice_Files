@@ -1,0 +1,67 @@
+{
+	"name": "pl_clinical_trail_landing_silver",
+	"properties": {
+		"activities": [
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/intellibidatabricks@gmail.com/intelliBI_databricks_clintrail/dbnb_landing_silver_load/nb_landing_silver_dm_load",
+					"baseParameters": {
+						"SrcSchemaName": {
+							"value": "@pipeline().parameters.pSrcSchemaName",
+							"type": "Expression"
+						},
+						"SrcTableName": {
+							"value": "@pipeline().parameters.pSrcTableName",
+							"type": "Expression"
+						},
+						"LandingContainerName": {
+							"value": "@pipeline().parameters.pLandingContainerName",
+							"type": "Expression"
+						},
+						"StorageAccName": {
+							"value": "@pipeline().parameters.pStorageAccName",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_databricks_notebook",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"pSrcSchemaName": {
+				"type": "string",
+				"defaultValue": "src"
+			},
+			"pSrcTableName": {
+				"type": "string",
+				"defaultValue": "TS"
+			},
+			"pLandingContainerName": {
+				"type": "string",
+				"defaultValue": "stdevclintrailedcsrc"
+			},
+			"pStorageAccName": {
+				"type": "string",
+				"defaultValue": "stclintraildev"
+			}
+		},
+		"folder": {
+			"name": "dev_clintrail/Clintrail_Landing_Silver"
+		},
+		"annotations": []
+	}
+}
